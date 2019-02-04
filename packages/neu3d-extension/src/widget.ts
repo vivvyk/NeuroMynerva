@@ -7,7 +7,7 @@ import { UUID } from '@phosphor/coreutils';
 import { Message } from '@phosphor/messaging';
 import { PromiseDelegate, JSONObject } from '@phosphor/coreutils';
 import * as izi from 'izitoast';
-import { IFFBOChildWidget, IFFBOLabWidget } from 'master-extension/';
+import { IFBLChildWidget, IFBLWidget } from 'master-extension/';
 import * as $ from "jquery";
 
 const NEU3D_CLASS = "jp-FFBOLabNLP";
@@ -19,7 +19,7 @@ const NEU3D_ID = 'vis-3d';
  * This widget depends on another package called Neu3D which is a
  * Morphology visualization tool also developed by Bionet Columbia.
  */
-export class Neu3DWidget extends Widget implements IFFBOChildWidget {
+export class Neu3DWidget extends Widget implements IFBLChildWidget {
   /**
    * Construct a new neu3D widget.
    */
@@ -202,7 +202,7 @@ export class Neu3DWidget extends Widget implements IFFBOChildWidget {
   /**
    * Connect to signal
    */
-  connect(inSignal: ISignal<IFFBOLabWidget, object>): void {
+  connect(inSignal: ISignal<IFBLWidget, object>): void {
     // console.log('[NEU3D] Connected');
     if (this._inSignal) {
       this._inSignal.disconnect(this._handleParentActions, this);
@@ -411,7 +411,7 @@ export class Neu3DWidget extends Widget implements IFFBOChildWidget {
    * @param sender 
    * @param value 
    */
-  private _handleParentActions(sender: IFFBOLabWidget, value: JSONObject): void {
+  private _handleParentActions(sender: IFBLWidget, value: JSONObject): void {
     if (value.type == "NLP") {
       console.log("{NLP received}");
       console.log(value);
@@ -503,10 +503,10 @@ export class Neu3DWidget extends Widget implements IFFBOChildWidget {
   }
 
   // /**
-  //  * Respond to FFBOLabModel Changed
+  //  * Respond to FBLModel Changed
   //  * <TODO>:  this method should handle actions in master widget neuron list like highlight
   //  */
-  // onModelChanged(sender: FFBOLabModel, value: JSONObject): void {
+  // onModelChanged(sender: FBLModel, value: JSONObject): void {
   //   return;
   // }
 
@@ -556,5 +556,5 @@ export class Neu3DWidget extends Widget implements IFFBOChildWidget {
   public neu3D: Neu3D;
   private n3dlog: any;
   private _userAction = new Signal<this, object>(this);
-  private _inSignal: ISignal<IFFBOLabWidget, object>;
+  private _inSignal: ISignal<IFBLWidget, object>;
 };

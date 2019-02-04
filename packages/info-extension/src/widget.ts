@@ -3,7 +3,7 @@ import { Signal, ISignal } from '@phosphor/signaling';
 import { UUID } from '@phosphor/coreutils';
 import { Message } from '@phosphor/messaging';
 import { PromiseDelegate, JSONObject } from '@phosphor/coreutils';
-import { IFFBOChildWidget, IFFBOLabWidget, FFBOLabModel } from 'master-extension/lib';
+import { IFBLChildWidget, IFBLWidget, FBLModel } from 'master-extension/lib';
 
 import { ConnSVG } from './conn_svg';
 import { SummaryTable } from './summary_table';
@@ -43,7 +43,7 @@ export interface INeuroInfoSubWidget {
  * NeuroInfo Widget is used to display detailed information
  * about neurons and connectivities obtained from NeuroArch *
  */
-export class NeuroInfoWidget extends Widget implements IFFBOChildWidget {
+export class NeuroInfoWidget extends Widget implements IFBLChildWidget {
   /**
    * Construct a new FFBO widget.
    */
@@ -147,7 +147,7 @@ export class NeuroInfoWidget extends Widget implements IFFBOChildWidget {
   /**
    * Connect to signal
    */
-  connect(inSignal: ISignal<IFFBOLabWidget, object>): void {
+  connect(inSignal: ISignal<IFBLWidget, object>): void {
     if (VERBOSE) { console.log('[NM INFO] Connected');}
     if(this._inSignal)
     {
@@ -163,7 +163,7 @@ export class NeuroInfoWidget extends Widget implements IFFBOChildWidget {
    * @param sender 
    * @param value 
    */
-  private _handleParentActions(sender: IFFBOLabWidget, value:JSONObject): void{
+  private _handleParentActions(sender: IFBLWidget, value:JSONObject): void{
     if(value.type == "INFO")
     {
       if(value.data == "save")
@@ -223,9 +223,9 @@ export class NeuroInfoWidget extends Widget implements IFFBOChildWidget {
 
 
   /**
-  * Respond to FFBOLabModel Changed <DUMMY>
+  * Respond to FBLModel Changed <DUMMY>
   */
-  onModelChanged(sender: FFBOLabModel, value: JSONObject): void {
+  onModelChanged(sender: FBLModel, value: JSONObject): void {
     this.model = sender;
     this.connTable.redraw();
     this.redraw();
@@ -375,7 +375,7 @@ export class NeuroInfoWidget extends Widget implements IFFBOChildWidget {
   /**
    * The Elements associated with the widget.
    */
-  private model: FFBOLabModel;
+  private model: FBLModel;
   private name: string;
   private data: any;
   private querySupressed: boolean;
@@ -385,7 +385,7 @@ export class NeuroInfoWidget extends Widget implements IFFBOChildWidget {
   private _isDisposed = false;
   private _isConnected = false;
   private _userAction = new Signal<this, object>(this);
-  private _inSignal: ISignal<IFFBOLabWidget, object>;
+  private _inSignal: ISignal<IFBLWidget, object>;
   
   readonly connSVG: ConnSVG;
   readonly summaryTable: SummaryTable;

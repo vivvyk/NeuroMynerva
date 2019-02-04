@@ -4,7 +4,7 @@ import { UUID } from '@phosphor/coreutils';
 import { Message } from '@phosphor/messaging';
 import { JSONObject,PromiseDelegate } from '@phosphor/coreutils';
 
-import { FFBOLabModel, IFFBOChildWidget, IFFBOLabWidget } from 'master-extension';
+import { FBLModel, IFBLChildWidget, IFBLWidget } from 'master-extension';
 
 import * as $ from "jquery";
 
@@ -19,7 +19,7 @@ const GFX_CLASS = "jp-FFBOLabGFX";
  * an iframe for now
  */
 export
-  class NeuroGFXWidget extends Widget implements IFFBOChildWidget {
+  class NeuroGFXWidget extends Widget implements IFBLChildWidget {
   /**
    * Construct a new GFX widget.
    */
@@ -106,7 +106,7 @@ export
    * @param sender 
    * @param value 
    */
-  private _handleParentActions(sender: IFFBOLabWidget, value:JSONObject): void{
+  private _handleParentActions(sender: IFBLWidget, value:JSONObject): void{
     if(value.type == "GFX")
     {
       if (VERBOSE) {console.log("{GFX received}");}
@@ -130,7 +130,7 @@ export
    * 
    * @param inSignal signal to connect to 
    */
-  connect(inSignal: ISignal<IFFBOLabWidget, object>): void {
+  connect(inSignal: ISignal<IFBLWidget, object>): void {
     if (VERBOSE) { console.log('[NM GFX] Connected');}
     if(this._inSignal)
     {
@@ -181,7 +181,7 @@ export
    * @param sender
    * @param value
    */
-  onModelChanged(sender: FFBOLabModel, value: JSONObject): void {
+  onModelChanged(sender: FBLModel, value: JSONObject): void {
     if (VERBOSE) { console.log("[NM GFX] onModelChanged:",sender,value);}
     this._iframe.contentWindow.postMessage({ messageType: "Data", data: {sender: sender, value: value} }, '*');
     //sender._value[value['data']].name
@@ -224,6 +224,6 @@ export
   private _blocker: HTMLDivElement;
   private _isDisposed = false;
   private _isConnected = false;
-  private _inSignal: ISignal<IFFBOLabWidget, object>;
+  private _inSignal: ISignal<IFBLWidget, object>;
 
 };

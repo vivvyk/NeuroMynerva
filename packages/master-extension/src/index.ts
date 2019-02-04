@@ -6,12 +6,10 @@ import { ILauncher } from '@jupyterlab/launcher';
 import { IMainMenu, JupyterLabMenu } from '@jupyterlab/mainmenu';
 import { showDialog, Dialog } from '@jupyterlab/apputils';
 import { ServiceManager, ServerConnection } from '@jupyterlab/services';
-// import { NotebookPanel } from '@jupyterlab/notebook';
-import { find } from '@phosphor/algorithm';
 import PerfectScrollbar from 'perfect-scrollbar';
-import { JSONExt } from '@phosphor/coreutils';
 
-import { FFBOLabWidget, IFFBOChildWidget } from './widget';
+// Import 
+import { FBLWidget, IFBLChildWidget } from './widget';
 
 // export model and widgets so that other child modules can import these settings
 export * from './model';
@@ -36,7 +34,7 @@ const FFBO_ICON_CLASS = 'jp-FFBOIcon';
 declare global {
   interface Window {
     FFBOLabsession: any;
-    FFBOLabWidget: any;
+    FBLWidget: any;
     FFBOLablayout: any;
     FFBOLabrestorer: any;
     _FFBOLABres: any;
@@ -51,7 +49,7 @@ declare global {
 /**
  * Initialization data for FFBOLab Plugin
  */
-const tracker: JupyterLabPlugin<InstanceTracker<FFBOLabWidget>> = {
+const tracker: JupyterLabPlugin<InstanceTracker<FBLWidget>> = {
   activate,
   id: '@jupyterlab/FFBOLab-extension:plugin',
   autoStart: true,
@@ -111,12 +109,12 @@ function activate(app: JupyterLab,
   menu: IMainMenu,
   state: IStateDB,
   launcher: ILauncher
-): InstanceTracker<FFBOLabWidget> {
+): InstanceTracker<FBLWidget> {
   if (VERBOSE) { console.log('[NM Master] NeuroMynerva extension activated!');}
   const namespace = 'NeuroMynerva';
-  let tracker = new InstanceTracker<FFBOLabWidget>({ namespace });
+  let tracker = new InstanceTracker<FBLWidget>({ namespace });
   const services = app.serviceManager;
-  let widget: FFBOLabWidget;
+  let widget: FBLWidget;
 
   window.JLabApp = app;
 
@@ -187,10 +185,10 @@ function createMenu(app: JupyterLab, menu: IMainMenu): void {
 }
 
 function addCommands(
-  widget: FFBOLabWidget,
+  widget: FBLWidget,
   app: JupyterLab,
   services: ServiceManager,
-  tracker: InstanceTracker<FFBOLabWidget>,
+  tracker: InstanceTracker<FBLWidget>,
   restorer: ILayoutRestorer,
   launcher: ILauncher,
   state: IStateDB,
@@ -226,8 +224,8 @@ function addCommands(
    * Create an NeuroMynerva Widget
    * @param {string} [path] Path pointing to the kernel session
    */
-  function createMynerva(path?: string): Promise<FFBOLabWidget> {
-    widget = new FFBOLabWidget({manager: services.sessions, path: path});
+  function createMynerva(path?: string): Promise<FBLWidget> {
+    widget = new FBLWidget({manager: services.sessions, path: path});
     let mainWidget = widget;
     return state.fetch('ffbo:state').then(_fetch => {
       // console.log(_fetch);
@@ -246,7 +244,7 @@ function addCommands(
         if(_fetch['neu3d'] != false)
         {
           // console.log('[MASTER] Neu3D: NEW');
-          _neu3d = commands.execute('NeuroMynerva:neu3d-open').then((widget:IFFBOChildWidget) => {
+          _neu3d = commands.execute('NeuroMynerva:neu3d-open').then((widget:IFBLChildWidget) => {
             widget.connect(mainWidget.outSignal);
             mainWidget.connectChild(widget.outSignal);
             if (VERBOSE) { console.log('[NM] Connected To [Neu3D]');}
@@ -262,7 +260,7 @@ function addCommands(
         if(_fetch['gfx'] != false)
         {
           // console.log('[MASTER] GFX: NEW');
-          _neurogfx = commands.execute('NeuroMynerva:neurogfx-open').then((widget:IFFBOChildWidget) => {
+          _neurogfx = commands.execute('NeuroMynerva:neurogfx-open').then((widget:IFBLChildWidget) => {
             widget.connect(mainWidget.outSignal);
             if (VERBOSE) { console.log(widget);}
             nonexist_gfx = true;
@@ -277,7 +275,7 @@ function addCommands(
         if(_fetch['info'] != false)
         {
           // console.log('[MASTER] INFO: NEW');
-          _info = commands.execute('NeuroMynerva:info-open').then((widget:IFFBOChildWidget) => {
+          _info = commands.execute('NeuroMynerva:info-open').then((widget:IFBLChildWidget) => {
             widget.connect(mainWidget.outSignal);
             mainWidget.connectChild(widget.outSignal);
             if (VERBOSE) { console.log('[NM] Connected To [Info]');}
@@ -342,7 +340,7 @@ function addCommands(
           // focus on master
           widget.activate();
           window.FFBOLabTracker = tracker;
-          window.FFBOLabWidget = widget;
+          window.FBLWidget = widget;
           window.JLabApp = app;
           window.ps = new PerfectScrollbar(".jp-FFBOLabMaster");
           return widget;
@@ -350,20 +348,20 @@ function addCommands(
       }
       else
       {
-        let _neu3d = commands.execute('NeuroMynerva:neu3d-open').then((widget:IFFBOChildWidget) => {
+        let _neu3d = commands.execute('NeuroMynerva:neu3d-open').then((widget:IFBLChildWidget) => {
           widget.connect(mainWidget.outSignal);
           mainWidget.connectChild(widget.outSignal);
           if (VERBOSE) { console.log('[NM] Connected To [Neu3D]');}
           nonexist_3d = true;
           commands.notifyCommandChanged(CommandIDs.toggle3d);
         });
-        let _neurogfx = commands.execute('NeuroMynerva:neurogfx-open').then((widget:IFFBOChildWidget) => {
+        let _neurogfx = commands.execute('NeuroMynerva:neurogfx-open').then((widget:IFBLChildWidget) => {
           widget.connect(mainWidget.outSignal);
           if (VERBOSE) { console.log(widget);}
           nonexist_gfx = true;
           commands.notifyCommandChanged(CommandIDs.toggleGfx);
         });
-        let _info = commands.execute('NeuroMynerva:info-open').then((widget:IFFBOChildWidget) => {
+        let _info = commands.execute('NeuroMynerva:info-open').then((widget:IFBLChildWidget) => {
           widget.connect(mainWidget.outSignal);
           mainWidget.connectChild(widget.outSignal);
           if (VERBOSE) { console.log('[NM] Connected To [Info]');}
@@ -420,7 +418,7 @@ function addCommands(
           // focus on master
           widget.activate();
           window.FFBOLabTracker = tracker;
-          window.FFBOLabWidget = widget;
+          window.FBLWidget = widget;
           window.JLabApp = app;
           window.ps = new PerfectScrollbar(".jp-FFBOLabMaster");
           return widget;
@@ -479,7 +477,7 @@ function addCommands(
   
         if(nonexist_info)
         {
-          commands.execute('NeuroMynerva:info-open').then((child:IFFBOChildWidget) => {
+          commands.execute('NeuroMynerva:info-open').then((child:IFBLChildWidget) => {
             child.connect(widget.outSignal);
             widget.connectChild(child.outSignal);
             widget.propogateSession();
@@ -489,7 +487,7 @@ function addCommands(
         }
         else
         {
-          commands.execute('NeuroMynerva:info-open').then((child:IFFBOChildWidget) => {
+          commands.execute('NeuroMynerva:info-open').then((child:IFBLChildWidget) => {
             child.dispose();
           });
         }
@@ -537,7 +535,7 @@ function addCommands(
   
         if(nonexist_3d)
         {
-          commands.execute('NeuroMynerva:neu3d-open').then((child:IFFBOChildWidget) => {
+          commands.execute('NeuroMynerva:neu3d-open').then((child:IFBLChildWidget) => {
             child.connect(widget.outSignal);
             widget.connectChild(child.outSignal);
             widget.propogateSession();
@@ -546,7 +544,7 @@ function addCommands(
         }
         else
         {
-          commands.execute('NeuroMynerva:neu3d-open').then((child:IFFBOChildWidget) => {
+          commands.execute('NeuroMynerva:neu3d-open').then((child:IFBLChildWidget) => {
             child.dispose();
           });
         }
@@ -591,7 +589,7 @@ function addCommands(
   
         if(nonexist_gfx)
         {
-          commands.execute('NeuroMynerva:neurogfx-open').then((child:IFFBOChildWidget) => {
+          commands.execute('NeuroMynerva:neurogfx-open').then((child:IFBLChildWidget) => {
             child.connect(widget.outSignal);
             widget.propogateSession();
         if (VERBOSE) { console.log(widget);}
@@ -599,7 +597,7 @@ function addCommands(
         }
         else
         {
-          commands.execute('NeuroMynerva:neurogfx-open').then((child:IFFBOChildWidget) => {
+          commands.execute('NeuroMynerva:neurogfx-open').then((child:IFBLChildWidget) => {
             child.dispose();
           });
         }
@@ -826,22 +824,22 @@ function addCommands(
    */
   commands.addCommand(CommandIDs.createNew, {
     execute: () => {
-      widget = new FFBOLabWidget({manager: services.sessions});
+      widget = new FBLWidget({manager: services.sessions});
       let mainWidget = widget;
-      let _neu3d = commands.execute('NeuroMynerva:neu3d-open').then((widget:IFFBOChildWidget) => {
+      let _neu3d = commands.execute('NeuroMynerva:neu3d-open').then((widget:IFBLChildWidget) => {
         widget.connect(mainWidget.outSignal);
         mainWidget.connectChild(widget.outSignal);
         if (VERBOSE) { console.log('[NM] Connected To [Neu3D]');}
         nonexist_3d = true;
         commands.notifyCommandChanged(CommandIDs.toggle3d);
       });
-      let _neurogfx = commands.execute('NeuroMynerva:neurogfx-open').then((widget:IFFBOChildWidget) => {
+      let _neurogfx = commands.execute('NeuroMynerva:neurogfx-open').then((widget:IFBLChildWidget) => {
         widget.connect(mainWidget.outSignal);
         if (VERBOSE) { console.log(widget);}
         nonexist_gfx = true;
         commands.notifyCommandChanged(CommandIDs.toggleGfx);
       });
-      let _info = commands.execute('NeuroMynerva:info-open').then((widget:IFFBOChildWidget) => {
+      let _info = commands.execute('NeuroMynerva:info-open').then((widget:IFBLChildWidget) => {
         widget.connect(mainWidget.outSignal);
         mainWidget.connectChild(widget.outSignal);
         if (VERBOSE) { console.log('[NM] Connected To [Info]');}
@@ -883,7 +881,7 @@ function addCommands(
             // focus on master
             // widget.activate();
             window.FFBOLabTracker = tracker;
-            window.FFBOLabWidget = widget;
+            window.FBLWidget = widget;
             window.JLabApp = app;
             app.shell.activateById(widget.id);
             commands.execute(CommandIDs.panelLayout);

@@ -3,10 +3,10 @@ import { IDisposable } from '@phosphor/disposable';
 import { ISignal, Signal} from '@phosphor/signaling';
 
 /**
-* An FFBOLab model.
+* A FBL model.
 */
 export
-interface IFFBOLabModel extends IDisposable {
+interface IFBLModel extends IDisposable {
   /**
   * The JSON object stored in the model.
   * {rid: {name: '', state}} 
@@ -22,16 +22,16 @@ interface IFFBOLabModel extends IDisposable {
   /**
    * Signal emitted when the value of the model is changed
    * 
-   * emits type is {type:'',data:{}}
+   * emits: `{type:'',data:{}}`
    */
-  readonly valueChanged: ISignal<IFFBOLabModel, JSONObject>;
+  readonly valueChanged: ISignal<IFBLModel, JSONObject>;
 }
 
 /**
 * The default implementation of the FFBOLab model.
 */
 export
-class FFBOLabModel implements IFFBOLabModel {
+class FBLModel implements IFBLModel {
   /**
   * Construct a new Model.
   */
@@ -43,7 +43,7 @@ class FFBOLabModel implements IFFBOLabModel {
   /**
    * emits signal when value is changed
    */
-  get valueChanged(): ISignal<FFBOLabModel, JSONObject>{
+  get valueChanged(): ISignal<FBLModel, JSONObject>{
     return this._valueChanged;
   }
 
@@ -86,7 +86,7 @@ class FFBOLabModel implements IFFBOLabModel {
   }
 
   /**
-   * newValue: {rid: {name: , highligh: , pinned:}}
+   * newValue: `{rid: {name: , highligh: , pinned:}}`
    */
   append(rid:string, newData: JSONObject): void {
     if (rid in this._value){

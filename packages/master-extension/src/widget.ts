@@ -5,16 +5,15 @@ import { IClientSession, ClientSession, Dialog, MainAreaWidget } from '@jupyterl
 import { UUID } from '@phosphor/coreutils';
 import { Signal, ISignal } from '@phosphor/signaling';
 import { JSONObject, PromiseDelegate } from '@phosphor/coreutils';
-
-
-import JSONEditor = require('jsoneditor');
-
-import { FFBOLabModel } from './model';
 import { NotebookPanel } from '@jupyterlab/notebook';
 import { Toolbar, ToolbarButton } from '@jupyterlab/apputils';
-import { Kernel, KernelMessage } from '@jupyterlab/services';
 
+// JSONEditor for neuron list in master widget
+import JSONEditor = require('jsoneditor');
 
+import { FBLModel } from './model';
+
+// Enable/Disable console logs
 const VERBOSE = false;
 
 
@@ -35,27 +34,27 @@ var filefloat = document.createElement('div');
 
 
 export
-  type IFFBOChildType = "Neu3D" | "GFX";
+  type IFBLChildType = "Neu3D" | "GFX";
 
 
 export
-  interface IFFBOLabWidget {
+  interface IFBLWidget {
   /**
-  * Response to change in `FFBOLabModel`
+  * Response to change in `FBLModel`
   * 
   * All widgets and child widgets should respond to changes in widget model
   */
-  onModelChanged(sender: FFBOLabModel, value: JSONObject): void;
+  onModelChanged(sender: FBLModel, value: JSONObject): void;
 
   /**
   * Connection to child widget through signal
   */
-  connectChild(signal: ISignal<IFFBOChildWidget, object>): void;
+  connectChild(signal: ISignal<IFBLChildWidget, object>): void;
 
   /**
-  * FFBOLabModel
+  * FBLModel
   */
-  readonly model: FFBOLabModel;
+  readonly model: FBLModel;
   species: string;
 
   readonly session: IClientSession | null;
@@ -67,11 +66,11 @@ export
 }
 
 export
-  interface IFFBOChildWidget {
+  interface IFBLChildWidget {
   /**
   * Connection to parent widget through signal
   */
-  connect(inSignal: ISignal<IFFBOLabWidget, object>): void;
+  connect(inSignal: ISignal<IFBLWidget, object>): void;
 
   /**
    * Output signal of child widget (used for connection to master)
@@ -89,7 +88,7 @@ export
 /**
 * An FFBOLab Master Widget
 */
-export class FFBOLabWidget extends Widget implements IFFBOLabWidget{
+export class FBLWidget extends Widget implements IFBLWidget{
   
   /**
   * 
@@ -101,7 +100,7 @@ export class FFBOLabWidget extends Widget implements IFFBOLabWidget{
   constructor(options: ClientSession.IOptions) {
     super();
     this.node.tabIndex = -1;
-    let model = new FFBOLabModel();
+    let model = new FBLModel();
     this.species = "adult";
     this.workspaceData = {adult: {model: '', data: ''}, larva: {model: '', data: ''}};
     
@@ -344,14 +343,14 @@ export class FFBOLabWidget extends Widget implements IFFBOLabWidget{
   * 
   * Change model displayed in JSON
   */
-  onModelChanged(sender: FFBOLabModel, value: JSONObject): void {
+  onModelChanged(sender: FBLModel, value: JSONObject): void {
     console.log("[MODEL] sent from original onModelChanged THIS IS BAD");
     this._outSignal.emit({type: 'model', data: {sender: sender, value: value}});
     this.JSONList.set(this.model.names);
     return;
   }
   
-  get modelChanged(): ISignal<FFBOLabWidget, void> {
+  get modelChanged(): ISignal<FBLWidget, void> {
     return this.modelChanged;
   }
   
@@ -401,7 +400,7 @@ export class FFBOLabWidget extends Widget implements IFFBOLabWidget{
     }
   }
 
-  connectChild(signal: ISignal<IFFBOChildWidget, object>): void {
+  connectChild(signal: ISignal<IFBLChildWidget, object>): void {
     // TODO: Handle synchronization of this with _registerComm()
     signal.connect(this._handleInputActions, this);
   }
@@ -428,7 +427,7 @@ export class FFBOLabWidget extends Widget implements IFFBOLabWidget{
    * @param sender 
    * @param value 
    */
-  private _handleInputActions(sender: IFFBOChildWidget, value:JSONObject): void{
+  private _handleInputActions(sender: IFBLChildWidget, value:JSONObject): void{
     if (VERBOSE) { console.log('[NM Master] INPUT:', sender,value)}
     switch (value.action){
       case 'execute':{
@@ -918,8 +917,8 @@ export class FFBOLabWidget extends Widget implements IFFBOLabWidget{
       this._createButton('fas fa-pen-square', 'Sync Variable', 'jp-SearchBar-Sync',
         () => {
           // TODO: SingleNeuronStr handling
-          var wholeCircuitStr = JSON.stringify(window.FFBOLabWidget.JSONList.get());
-          // var SingleNeuronStr = JSON.stringify(window.FFBOLabWidget.InfoWidget.INFOList.jsoneditor.get());
+          var wholeCircuitStr = JSON.stringify(window.FBLWidget.JSONList.get());
+          // var SingleNeuronStr = JSON.stringify(window.FBLWidget.InfoWidget.INFOList.jsoneditor.get());
           if(this.session.kernel)
           {
             this.session.kernel.requestExecute({ code: '_FFBOLABClient.updateBackend(type = "WholeCircuit",data = """' + wholeCircuitStr + '""")' });
@@ -1066,7 +1065,7 @@ export class FFBOLabWidget extends Widget implements IFFBOLabWidget{
 
   private _outSignal = new Signal<this, object>(this);
 
-  readonly model: FFBOLabModel;
+  readonly model: FBLModel;
   public species: any;
   private workspaceData: any;
   public session: ClientSession;
