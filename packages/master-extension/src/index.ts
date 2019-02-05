@@ -1,36 +1,41 @@
 import { JupyterLab, JupyterLabPlugin, ILayoutRestorer } from '@jupyterlab/application';
 import { ICommandPalette, InstanceTracker } from '@jupyterlab/apputils';
-import { ReadonlyJSONObject, JSONObject, JSONValue } from '@phosphor/coreutils';
-import { Widget, Menu } from '@phosphor/widgets';
+import { ReadonlyJSONObject, JSONObject } from '@phosphor/coreutils';
+import { Widget } from '@phosphor/widgets';
 import { ILauncher } from '@jupyterlab/launcher';
 import { IMainMenu, JupyterLabMenu } from '@jupyterlab/mainmenu';
 import { showDialog, Dialog } from '@jupyterlab/apputils';
-import { ServiceManager, ServerConnection } from '@jupyterlab/services';
+import { ServiceManager } from '@jupyterlab/services';
+import { IStateDB } from '@jupyterlab/coreutils';
+
 import PerfectScrollbar from 'perfect-scrollbar';
 
 // Import 
 import { FBLWidget, IFBLChildWidget } from './widget';
-
-// export model and widgets so that other child modules can import these settings
-export * from './model';
-export * from './widget';
 
 // import css files
 import '../style/index.css';
 import '../style/izitoast.min.css';
 import '../style/jsoneditor.css';
 import '../style/perfectscrollbar.css';
-import { NotebookPanel } from '@jupyterlab/notebook';
-import { IStateDB } from '@jupyterlab/coreutils';
 
+// export model and widgets so that other child modules can import these settings
+export * from './model';
+export * from './widget';
+
+// Enable/Disable console log messages
 const VERBOSE = false;
 
 /**
  * The class name for the FFBOLab icon in the default theme.
  */
-const FFBO_ICON_CLASS = 'jp-FFBOIcon';
+const FBL_ICON_CLASS = 'jp-FBLIcon';
 
-
+/**
+ * global namespace
+ * 
+ * `global` namespace exposes javascript variables to `window` namespace
+ */
 declare global {
   interface Window {
     FFBOLabsession: any;
@@ -46,12 +51,13 @@ declare global {
     testData: any;
   }
 }
+
 /**
- * Initialization data for FFBOLab Plugin
+ * Initialization data for FBL Plugin
  */
 const tracker: JupyterLabPlugin<InstanceTracker<FBLWidget>> = {
   activate,
-  id: '@jupyterlab/FFBOLab-extension:plugin',
+  id: '@jupyterlab/FBL-extension:plugin',
   autoStart: true,
   requires: [ICommandPalette, ILayoutRestorer, IMainMenu, IStateDB],
   optional: [ILauncher]
@@ -897,7 +903,7 @@ function addCommands(
     },
     // label: 'Create New Workspace',
     label: 'Create New',
-    iconClass: FFBO_ICON_CLASS
+    iconClass: FBL_ICON_CLASS
   });
 
   /**

@@ -197,7 +197,7 @@ body{
     overflow: scroll;
 }
 
-.jp-FFBOIcon {
+.jp-FBLIcon {
     /* background-image: var(--jp-icon-ffbo-lab); */
     background-image: url('img/ffbo_logo.png');
     /* background-image: var(--jp-icon-terminal); */
